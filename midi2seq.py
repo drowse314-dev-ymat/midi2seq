@@ -33,3 +33,19 @@ class MIDIConverter(object):
                 return None
             return dict(type='beat')
         return default_mapper
+
+
+def merge_time_sequences(seq_a, seq_b):
+    rev_seq_a = list(reversed(seq_a))
+    rev_seq_b = list(reversed(seq_b))
+
+    while rev_seq_a and rev_seq_b:
+        if rev_seq_a[-1]['time_ms'] <= rev_seq_b[-1]['time_ms']:
+            yield rev_seq_a.pop()
+        else:
+            yield rev_seq_b.pop()
+
+    while rev_seq_a:
+        yield rev_seq_a.pop()
+    while rev_seq_b:
+        yield rev_seq_b.pop()

@@ -6,6 +6,7 @@ import midi2seq
 
 
 conversion = attest.Tests()
+utils = attest.Tests()
 
 
 class Simple(object):
@@ -61,6 +62,14 @@ class Simple(object):
             klass.beat(time_ms=500, channel=None),
         ]
 
+    @classmethod
+    def as_tone_channeled_seq(klass):
+        return [
+            klass.beat(time_ms=100, channel='C'),
+            klass.beat(time_ms=200, channel='D'),
+            klass.beat(time_ms=500, channel='C'),
+        ]
+
     @staticmethod
     def beat(time_ms=0, channel=None):
         return dict(
@@ -110,9 +119,51 @@ def midi_obj_to_seq_using_note_based_mapper():
             Simple.midi_beats_track())) ==
         Simple.as_beat_and_hold_seq())
 
+@conversion.test
+def midi_obj_to_seq_with_channel_mapping():
+    converter = midi2seq.MIDIConverter()
+    def ev_mapper(event):
+        if isinstance(event, iomidi.NoteOnEvent):
+            if event.key == 60:
+                return dict(type='beat', channel='C')
+            elif event.key == 62:
+                return dict(type='beat', channel='D')
+        return None
+    converter = midi2seq.MIDIConverter(event_mapper=ev_mapper)
+
+    assert (
+        list(converter.to_seq(
+            Simple.midi_beats_track())) ==
+        Simple.as_tone_channeled_seq())
+
+
+@utils.test
+def merge_time_sequences():
+    seq_a = [
+        Simple.beat(time_ms=100),
+        Simple.holdon(time_ms=200),
+        Simple.holdoff(time_ms=300),
+    ]
+    seq_b = [
+        Simple.beat(time_ms=150),
+        Simple.beat(time_ms=200),
+        Simple.beat(time_ms=288),
+    ]
+    assert (
+        list(midi2seq.merge_time_sequences(seq_a, seq_b)) ==
+        [
+            Simple.beat(time_ms=100),
+            Simple.beat(time_ms=150),
+            Simple.holdon(time_ms=200),
+            Simple.beat(time_ms=200),
+            Simple.beat(time_ms=288),
+            Simple.holdoff(time_ms=300),
+        ])
+
 
 if __name__ == '__main__':
     tests = attest.Tests([
-        conversion
+        conversion,
+        utils,
     ])
     tests.run()
