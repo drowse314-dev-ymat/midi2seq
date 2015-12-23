@@ -51,7 +51,7 @@ def merge_time_sequences(seq_a, seq_b):
     while rev_seq_b:
         yield rev_seq_b.pop()
 
-def sequences_with_ms(seq, midi_header):
+def sequence_with_ms(seq, midi_header):
     for event in seq:
         event['time_ms'] = ticks_to_ms(
             event['time_ticks'], midi_header.division)
