@@ -37,8 +37,8 @@ class MIDIConverter(object):
 
 
 def merge_time_sequences(seq_a, seq_b):
-    rev_seq_a = list(reversed(seq_a))
-    rev_seq_b = list(reversed(seq_b))
+    rev_seq_a = list(reversed(list(seq_a)))
+    rev_seq_b = list(reversed(list(seq_b)))
 
     while rev_seq_a and rev_seq_b:
         if rev_seq_a[-1]['time_ticks'] <= rev_seq_b[-1]['time_ticks']:
