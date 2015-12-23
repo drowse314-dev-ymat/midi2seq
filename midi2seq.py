@@ -1,6 +1,10 @@
 # encoding: utf-8
 
+import sys
+import random
 import decimal
+import json
+import argparse
 import iomidi
 
 
@@ -63,3 +67,49 @@ def ticks_to_ms(ticks, time_division):
         1 / decimal.Decimal(time_division) * 1000
         # multiplied by #ticks
         * ticks)
+
+
+def CLI(args):
+    song = iomidi.read(args.midifile)
+    converter = MIDIConverter()
+
+    sequences = (
+        sequence_with_ms(
+            converter.to_seq(track),
+            song.header)
+        for track in song.tracks)
+
+    merged_sequence = reduce(
+        merge_time_sequences,
+        sequences,
+        [])
+
+    channelled_sequence = random_channeler(
+        merged_sequence,
+        list(range(1, 10)))
+
+    sys.stdout.write(
+        json.dumps(list(channelled_sequence)))
+
+def random_channeler(seq, channels=[0, 1]):
+    channel = random.choice(channels)
+    suc = dict(time_ticks=-1, channel=channel)
+    for event in seq:
+        while (
+            suc['time_ticks'] != event['time_ticks'] and
+            channel == suc['channel']):
+
+            channel = random.choice(channels)
+
+        event['channel'] = channel
+        suc = event
+        yield event
+
+
+if __name__ == '__main__':
+    argX = argparse.ArgumentParser()
+
+    argX.add_argument('midifile')
+
+    args = argX.parse_args()
+    CLI(args)
