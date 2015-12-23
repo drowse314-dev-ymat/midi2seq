@@ -48,45 +48,45 @@ class Simple(object):
     @classmethod
     def as_beat_seq(klass):
         return [
-            klass.beat(time_ms=100, channel=None),
-            klass.beat(time_ms=200, channel=None),
-            klass.beat(time_ms=500, channel=None),
+            klass.beat(time_ticks=100, channel=None),
+            klass.beat(time_ticks=200, channel=None),
+            klass.beat(time_ticks=500, channel=None),
         ]
 
     @classmethod
     def as_beat_and_hold_seq(klass):
         return [
-            klass.beat(time_ms=100, channel=None),
-            klass.holdon(time_ms=200, channel=None),
-            klass.holdoff(time_ms=400, channel=None),
-            klass.beat(time_ms=500, channel=None),
+            klass.beat(time_ticks=100, channel=None),
+            klass.holdon(time_ticks=200, channel=None),
+            klass.holdoff(time_ticks=400, channel=None),
+            klass.beat(time_ticks=500, channel=None),
         ]
 
     @classmethod
     def as_tone_channeled_seq(klass):
         return [
-            klass.beat(time_ms=100, channel='C'),
-            klass.beat(time_ms=200, channel='D'),
-            klass.beat(time_ms=500, channel='C'),
+            klass.beat(time_ticks=100, channel='C'),
+            klass.beat(time_ticks=200, channel='D'),
+            klass.beat(time_ticks=500, channel='C'),
         ]
 
     @staticmethod
-    def beat(time_ms=0, channel=None):
+    def beat(time_ticks=0, channel=None):
         return dict(
             type='beat',
-            time_ms=time_ms,
+            time_ticks=time_ticks,
             channel=channel)
     @staticmethod
-    def holdon(time_ms=0, channel=None):
+    def holdon(time_ticks=0, channel=None):
         return dict(
             type='holdon',
-            time_ms=time_ms,
+            time_ticks=time_ticks,
             channel=channel)
     @staticmethod
-    def holdoff(time_ms=0, channel=None):
+    def holdoff(time_ticks=0, channel=None):
         return dict(
             type='holdoff',
-            time_ms=time_ms,
+            time_ticks=time_ticks,
             channel=channel)
 
 
@@ -140,24 +140,24 @@ def midi_obj_to_seq_with_channel_mapping():
 @utils.test
 def merge_time_sequences():
     seq_a = [
-        Simple.beat(time_ms=100),
-        Simple.holdon(time_ms=200),
-        Simple.holdoff(time_ms=300),
+        Simple.beat(time_ticks=100),
+        Simple.holdon(time_ticks=200),
+        Simple.holdoff(time_ticks=300),
     ]
     seq_b = [
-        Simple.beat(time_ms=150),
-        Simple.beat(time_ms=200),
-        Simple.beat(time_ms=288),
+        Simple.beat(time_ticks=150),
+        Simple.beat(time_ticks=200),
+        Simple.beat(time_ticks=288),
     ]
     assert (
         list(midi2seq.merge_time_sequences(seq_a, seq_b)) ==
         [
-            Simple.beat(time_ms=100),
-            Simple.beat(time_ms=150),
-            Simple.holdon(time_ms=200),
-            Simple.beat(time_ms=200),
-            Simple.beat(time_ms=288),
-            Simple.holdoff(time_ms=300),
+            Simple.beat(time_ticks=100),
+            Simple.beat(time_ticks=150),
+            Simple.holdon(time_ticks=200),
+            Simple.beat(time_ticks=200),
+            Simple.beat(time_ticks=288),
+            Simple.holdoff(time_ticks=300),
         ])
 
 

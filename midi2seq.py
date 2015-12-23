@@ -9,11 +9,11 @@ class MIDIConverter(object):
         self._event_mapper = self._get_event_mapper(event_mapper)
 
     def to_seq(self, midi_track):
-        accumulated_time_ms = 0
+        accumulated_time_ticks = 0
         event_mapper = self._event_mapper
 
         for event in midi_track.events:
-            accumulated_time_ms += event.delta
+            accumulated_time_ticks += event.delta
             event_descriptor = event_mapper(event)
 
             if event_descriptor is None:
@@ -22,7 +22,7 @@ class MIDIConverter(object):
             yield dict(
                 type=event_descriptor['type'],
                 channel=event_descriptor.get('channel', None),
-                time_ms=accumulated_time_ms)
+                time_ticks=accumulated_time_ticks)
 
     def _get_event_mapper(self, user_mapper):
         if user_mapper is not None:
@@ -40,7 +40,7 @@ def merge_time_sequences(seq_a, seq_b):
     rev_seq_b = list(reversed(seq_b))
 
     while rev_seq_a and rev_seq_b:
-        if rev_seq_a[-1]['time_ms'] <= rev_seq_b[-1]['time_ms']:
+        if rev_seq_a[-1]['time_ticks'] <= rev_seq_b[-1]['time_ticks']:
             yield rev_seq_a.pop()
         else:
             yield rev_seq_b.pop()
