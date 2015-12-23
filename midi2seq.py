@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import decimal
 import iomidi
 
 
@@ -49,3 +50,16 @@ def merge_time_sequences(seq_a, seq_b):
         yield rev_seq_a.pop()
     while rev_seq_b:
         yield rev_seq_b.pop()
+
+def sequences_with_ms(seq, midi_header):
+    for event in seq:
+        event['time_ms'] = ticks_to_ms(
+            event['time_ticks'], midi_header.division)
+        yield event
+
+def ticks_to_ms(ticks, time_division):
+    return float(
+        # tick as milliseconds
+        1 / decimal.Decimal(time_division) * 1000
+        # multiplied by #ticks
+        * ticks)

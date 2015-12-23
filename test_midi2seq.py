@@ -136,6 +136,11 @@ def midi_obj_to_seq_with_channel_mapping():
             Simple.midi_beats_track())) ==
         Simple.as_tone_channeled_seq())
 
+@conversion.test
+def convert_ticks_to_ms():
+    assert (90 < midi2seq.ticks_to_ms(100, 960))
+    assert (midi2seq.ticks_to_ms(100, 960) < 110)
+
 
 @utils.test
 def merge_time_sequences():
